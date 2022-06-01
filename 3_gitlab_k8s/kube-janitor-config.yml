@@ -1,0 +1,6 @@
+# delete all resources within the "test" namespace after 1 day
+- id: test-namespace-cleanup
+  resources:
+  - "*"
+  jmespath: "metadata.namespace == 'test'"
+  ttl: 1d

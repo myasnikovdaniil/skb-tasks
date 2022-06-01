@@ -1,0 +1,50 @@
+pipeline {
+    agent {
+                label 'node'
+            }
+    stages {
+        stage('Install') {
+            steps {
+                sh 'npm install'
+            }
+        }
+        stage('Test') {
+            parallel {
+                stage('Static code analysis') {
+                    steps {
+                        sh 'npm run-script lint'
+                    }
+                }
+                stage('Unit tests') {
+                    steps {
+                        sh 'npm run-script test'
+                    }
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'npm run-script build --prod'
+            }
+        }
+        stage('Deploy') {
+            when {
+              expression {
+                currentBuild.result == null || currentBuild.result == 'SUCCESS' 
+              }
+            }
+            steps {
+                sh "scp -r dist nginx@test-nginx.example:/var/www/html/${BRANCH_NAME}"
+                sh "
+                ssh nginx@test-nginx.example
+                echo \"location /${BRANCH_NAME}/ {  
+                            alias /var/www/html/${BRANCH_NAME};
+                            index index.html index.htm;
+                            try_files \$uri \$uri/ /index.html;
+                            }
+                        \" \
+                > /etc/nginx/conf.d/angular_locations/${BRANCH_NAME}.conf
+                nginx -s reload"
+            }
+        }
+    }

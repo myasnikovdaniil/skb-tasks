@@ -1,0 +1,7 @@
+GITLAB_URL = https://gitlab.example.com
+GITLAB_TOKEN = xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+SMTP_SERVER = smtp.gmail.com
+SMTP_SERVER_PORT = 465
+SOURCE_EMAIL = test@gmail.com
+SMTP_PASS = P@ssw0rd
+TMP_DIR = /data
